@@ -45,3 +45,5 @@ out/
 !**/src/main/**
 !**/src/test/**
 /.idea/
+/MySql/
+/PostgresSql/

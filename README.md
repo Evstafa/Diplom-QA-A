@@ -21,10 +21,10 @@
 5. Запустить приложение командой:
 - для запуска с подключением к MySQL:
 
-`java -jar aqa-shop.jar --spring.datasource.url=jdbc:mysql://localhost:3306/app`
+`java -jar artifacts/aqa-shop.jar --spring.datasource.url=jdbc:mysql://localhost:3306/app`
 - для запуска с подключением к PostgreSQL:
 
-`java -jar aqa-shop.jar --spring.datasource.url=jdbc:postgresql://localhost:5432/app`
+`java -jar artifacts/aqa-shop.jar --spring.datasource.url=jdbc:postgresql://localhost:5432/app`
 
 6. Запустить тесты во второй вкладке Terminal командой:
 - для запуска с подключением к MySQL:
