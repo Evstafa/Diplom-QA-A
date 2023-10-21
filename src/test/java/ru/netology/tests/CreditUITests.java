@@ -27,11 +27,6 @@ public class CreditUITests {
     }
 
     @AfterAll
-    static void tearDown() {
-        cleanDatabase();
-    }
-
-    @AfterAll
     public static void tearDownAll() {
         SelenideLogger.removeListener("allure");
     }

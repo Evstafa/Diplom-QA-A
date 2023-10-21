@@ -12,26 +12,30 @@
 3. [Отчет по итогам тестирования](https://github.com/Evstafa/Diplom-QA-A/blob/main/documentation/Report.md)
 4. [Отчет по итогам автоматизации](https://github.com/Evstafa/Diplom-QA-A/blob/main/documentation/Summary.md)
 
-### Запуск проекта, тестирование, отчет ###
+### Подготовительный этап ###
 
 1. Запустить Docker Desktop
 2. Запустить IntelliJ IDEA
 3. Открыть скачанный с GitHub проект (https://github.com/Evstafa/Diplom-QA-A)
-4. Запустить контейнеры командой в корне проекта `docker-compose up`
-5. Запустить приложение командой:
+
+### Запуск приложения, тестирование, отчет ###
+
+1. Запустить контейнеры командой в корне проекта `docker-compose up`
+2. В новой вкладке терминала запустить тестируемое приложение командой:
+
 - для запуска с подключением к MySQL:
-
 `java -jar artifacts/aqa-shop.jar --spring.datasource.url=jdbc:mysql://localhost:3306/app`
+- 
 - для запуска с подключением к PostgreSQL:
-
 `java -jar artifacts/aqa-shop.jar --spring.datasource.url=jdbc:postgresql://localhost:5432/app`
 
+
 6. Запустить тесты во второй вкладке Terminal командой:
+
 - для запуска с подключением к MySQL:
-
 `.\gradlew clean test -DdbUrl=jdbc:mysql://localhost:3306/app`
+- 
 - для запуска с подключением к PostgreSQL:
-
 `.\gradlew clean test -DdbUrl=jdbc:postgresql://localhost:5432/app`
 
 7. Получить отчет после полного завершения тестов в браузере командой `.\gradlew allureServe`

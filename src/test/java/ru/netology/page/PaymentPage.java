@@ -25,6 +25,9 @@ public class PaymentPage {
     private SelenideElement errorButton = errorNotification.$("button");
     private SelenideElement inputInvalid = $(".input__sub");
 
+    public void getInputInvalid(String message) {
+        inputInvalid.shouldBe(visible).shouldHave(text(message));
+    }
     public PaymentPage() {
         SelenideElement heading = $$("h3").find(text("Оплата по карте"));
         heading.shouldBe(visible);
@@ -60,9 +63,5 @@ public class PaymentPage {
         errorNotification.$("[class=notification__content]").should(text("Ошибка! Банк отказал в проведении операции."));
         errorButton.click();
         errorNotification.should(hidden);
-    }
-
-    public void getInputInvalid(String message) {
-        inputInvalid.shouldBe(visible).shouldHave(text(message));
     }
 }

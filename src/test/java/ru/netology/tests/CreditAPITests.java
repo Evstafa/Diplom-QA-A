@@ -22,7 +22,7 @@ public class CreditAPITests {
     private static List<DBHelper.PaymentEntity> payments;
     private static List<DBHelper.CreditRequestEntity> credits;
     private static List<DBHelper.OrderEntity> orders;
-    private static final String creditUrl = "/credit";
+    private static final String creditUrl = "http://localhost:8080/";
 
     @BeforeAll
     public static void setUpAll() {

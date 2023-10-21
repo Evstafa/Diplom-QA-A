@@ -23,7 +23,7 @@ public class PaymentAPITests {
     private static List<DBHelper.PaymentEntity> payments;
     private static List<DBHelper.CreditRequestEntity> credits;
     private static List<DBHelper.OrderEntity> orders;
-    private static final String paymentUrl = "/payment";
+    private static final String paymentUrl = "http://localhost:8080/";
 
     @BeforeAll
     public static void setUpAll() {

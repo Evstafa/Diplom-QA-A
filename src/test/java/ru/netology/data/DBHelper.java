@@ -98,14 +98,14 @@ public class DBHelper {
     @SneakyThrows
     public static String getPaymentStatus() {
         getConn();
-        var dbStatus = "SELECT status FROM payment_entity;";
+        var dbStatus = "SELECT status FROM payment_entity ORDER BY id DESC LIMIT 1";
         return runner.query(getConn(), dbStatus, new ScalarHandler<>());
     }
 
     @SneakyThrows
     public static String getCreditStatus() {
         getConn();
-        var dbStatus = "SELECT status FROM credit_request_entity;";
+        var dbStatus = "SELECT status FROM credit_request_entity ORDER BY id DESC LIMIT 1";
         return runner.query(getConn(), dbStatus, new ScalarHandler<>());
     }
 
