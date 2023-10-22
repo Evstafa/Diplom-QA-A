@@ -4,7 +4,8 @@ import com.codeborne.selenide.SelenideElement;
 import ru.netology.data.DataHelper;
 
 import java.time.Duration;
-import javax.validation.constraints.Pattern;
+import java.time.LocalDate;
+
 import static com.codeborne.selenide.Condition.*;
 import static com.codeborne.selenide.Selectors.byText;
 import static com.codeborne.selenide.Selenide.$;
@@ -13,25 +14,10 @@ import static com.codeborne.selenide.Selenide.$$;
 public class CreditPage {
 
     private final SelenideElement heading = $$("h3").find(text("Кредит по данным карты"));
-
-    @Pattern(regexp = "^[0-9]{16}$")
-
     private final SelenideElement cardNumberField = $(byText("Номер карты")).parent().$(".input__control");
-
-    @Pattern(regexp = "^(0?[0-1]|1[0-2])$")
-
     private final SelenideElement monthField = $(byText("Месяц")).parent().$(".input__control");
-
-    @Pattern(regexp = "^2024$")
-
     private final SelenideElement yearField = $(byText("Год")).parent().$(".input__control");
-
-    @Pattern(regexp = "^[A-Za-z]+\\s[A-Za-z]+$")
-
     private final SelenideElement holderField = $(byText("Владелец")).parent().$(".input__control");
-
-    @Pattern(regexp = "\\d{3}")
-
     private final SelenideElement cvcField = $(byText("CVC/CVV")).parent().$(".input__control");
     private final SelenideElement continueButton = $$("button").find(exactText("Продолжить"));
     private final SelenideElement successNotification = $(".notification_status_ok");
@@ -41,17 +27,28 @@ public class CreditPage {
 
     public CreditPage() {
         heading.shouldBe(visible);
+
         cardNumberField.shouldBe(visible);
+        cardNumberField.shouldBe(matchText("^[0-9]{16}$"));
+
         monthField.shouldBe(visible);
+        monthField.shouldBe(matchText("^(0?[0-1]|1[0-2])$"));
+
         yearField.shouldBe(visible);
+        yearField.shouldBe(matchText(String.valueOf(LocalDate.now().plusYears(1).getYear())));
+
         holderField.shouldBe(visible);
+        holderField.shouldBe(matchText("^[A-Za-z]+\\\\s[A-Za-z]+$"));
+
         cvcField.shouldBe(visible);
+        cvcField.shouldBe(matchText("\\d{3}"));
+
         continueButton.shouldBe(visible);
         successNotification.shouldBe(hidden);
         errorNotification.shouldBe(hidden);
     }
 
-    public static void inputData(DataHelper.CardInfo card) {
+    public void inputData(DataHelper.CardInfo card) {
         cardNumberField.setValue(card.getNumber());
         monthField.setValue(card.getMonth());
         yearField.setValue(card.getYear());

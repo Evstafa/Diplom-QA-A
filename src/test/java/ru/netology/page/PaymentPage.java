@@ -25,9 +25,6 @@ public class PaymentPage {
     private SelenideElement errorButton = errorNotification.$("button");
     private SelenideElement inputInvalid = $(".input__sub");
 
-    public void getInputInvalid(String message) {
-        inputInvalid.shouldBe(visible).shouldHave(text(message));
-    }
     public PaymentPage() {
         SelenideElement heading = $$("h3").find(text("Оплата по карте"));
         heading.shouldBe(visible);
@@ -40,6 +37,7 @@ public class PaymentPage {
         successNotification.shouldBe(hidden);
         errorNotification.shouldBe(hidden);
     }
+
     public void inputData(DataHelper.CardInfo card) {
         cardNumberField.setValue(card.getNumber());
         monthField.setValue(card.getMonth());
@@ -63,5 +61,10 @@ public class PaymentPage {
         errorNotification.$("[class=notification__content]").should(text("Ошибка! Банк отказал в проведении операции."));
         errorButton.click();
         errorNotification.should(hidden);
+    }
+
+    public void getInputInvalid(String message) {
+        inputInvalid.shouldHave(text(message));
+        inputInvalid.shouldBe(visible);
     }
 }

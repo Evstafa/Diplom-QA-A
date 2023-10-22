@@ -29,12 +29,7 @@ public class CreditAPITests {
         SelenideLogger.addListener("allure", new AllureSelenide());
     }
 
-    @BeforeAll
-    public static void setUp() {
-        cleanDatabase();
-    }
-
-    @AfterEach
+    @BeforeEach
     public void tearDown() {
         cleanDatabase();
     }

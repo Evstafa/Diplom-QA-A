@@ -23,19 +23,13 @@ public class PaymentAPITests {
     private static List<DBHelper.PaymentEntity> payments;
     private static List<DBHelper.CreditRequestEntity> credits;
     private static List<DBHelper.OrderEntity> orders;
-    private static final String paymentUrl = "http://localhost:8080/";
 
     @BeforeAll
     public static void setUpAll() {
         SelenideLogger.addListener("allure", new AllureSelenide());
     }
 
-    @BeforeAll
-    public static void setUp() {
-        cleanDatabase();
-    }
-
-    @AfterEach
+    @BeforeEach
     public void tearDown() {
         cleanDatabase();
     }
@@ -51,7 +45,6 @@ public class PaymentAPITests {
     @Test
     public void shouldValidTestCardApprovedEntityAdded() {
         var cardInfo = DataHelper.getValidCardApproved();
-        DBHelper.getBody(cardInfo, paymentUrl,200);
         payments = DBHelper.getPayments();
         credits = DBHelper.getCreditRequests();
 
@@ -66,7 +59,6 @@ public class PaymentAPITests {
     @Test
     public void shouldValidTestCardApprovedOrdersAdded() {
         var cardInfo = DataHelper.getValidCardApproved();
-        DBHelper.getBody(cardInfo, paymentUrl, 200);
         orders = DBHelper.getOrders();
 
         assertEquals(1, orders.size());
@@ -79,7 +71,6 @@ public class PaymentAPITests {
     @Test
     public void shouldValidTestCardDeclinedEntityAdded() {
         var cardInfo = DataHelper.getValidCardDeclined();
-        DBHelper.getBody(cardInfo, paymentUrl, 200);
         payments = DBHelper.getPayments();
         credits = DBHelper.getCreditRequests();
 
@@ -94,7 +85,6 @@ public class PaymentAPITests {
     @Test
     public void shouldValidTestCardDeclinedOrdersAdded() {
         var cardInfo = DataHelper.getValidCardDeclined();
-        DBHelper.getBody(cardInfo, paymentUrl, 200);
         orders = DBHelper.getOrders();
 
         assertEquals(1, orders.size());
@@ -107,7 +97,6 @@ public class PaymentAPITests {
     @Test
     public void shouldPOSTBodyEmpty() {
         var cardInfo = DataHelper.getAllEmpty();
-        DBHelper.getBody(cardInfo, paymentUrl, 400);
         payments = DBHelper.getPayments();
         credits = DBHelper.getCreditRequests();
         orders = DBHelper.getOrders();
@@ -123,7 +112,6 @@ public class PaymentAPITests {
     @Test
     public void shouldPOSTNumberEmpty() {
         var cardInfo = DataHelper.getCardEmpty();
-        DBHelper.getBody(cardInfo, paymentUrl, 400);
         payments = DBHelper.getPayments();
         credits = DBHelper.getCreditRequests();
         orders = DBHelper.getOrders();
@@ -139,7 +127,6 @@ public class PaymentAPITests {
     @Test
     public void shouldPOSTMonthEmpty() {
         var cardInfo = DataHelper.getMonthEmpty();
-        DBHelper.getBody(cardInfo, paymentUrl, 400);
         payments = DBHelper.getPayments();
         credits = DBHelper.getCreditRequests();
         orders = DBHelper.getOrders();
@@ -155,7 +142,6 @@ public class PaymentAPITests {
     @Test
     public void shouldPOSTYearEmpty() {
         var cardInfo = DataHelper.getYearEmpty();
-        DBHelper.getBody(cardInfo, paymentUrl, 400);
         payments = DBHelper.getPayments();
         credits = DBHelper.getCreditRequests();
         orders = DBHelper.getOrders();
@@ -171,7 +157,6 @@ public class PaymentAPITests {
     @Test
     public void shouldPOSTHolderEmpty() {
         var cardInfo = DataHelper.getHolderEmpty();
-        DBHelper.getBody(cardInfo, paymentUrl, 400);
         payments = DBHelper.getPayments();
         credits = DBHelper.getCreditRequests();
         orders = DBHelper.getOrders();
@@ -187,7 +172,6 @@ public class PaymentAPITests {
     @Test
     public void shouldPOSTCvcEmpty() {
         var cardInfo = DataHelper.getCvcEmpty();
-        DBHelper.getBody(cardInfo, paymentUrl, 400);
         payments = DBHelper.getPayments();
         credits = DBHelper.getCreditRequests();
         orders = DBHelper.getOrders();
