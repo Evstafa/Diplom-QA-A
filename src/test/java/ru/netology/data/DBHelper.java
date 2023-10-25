@@ -5,7 +5,10 @@ import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.LogDetail;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.SneakyThrows;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.dbutils.handlers.BeanListHandler;
@@ -22,7 +25,7 @@ public class DBHelper {
 
     private static final QueryRunner runner = new QueryRunner();
     private static final Gson gson = new Gson();
-    private static final RequestSpecification spec = new RequestSpecBuilder().setBaseUri("http://localhost").setPort(9999)
+    private static final RequestSpecification spec = new RequestSpecBuilder().setBaseUri("http://localhost").setPort(8080)
             .setAccept(ContentType.JSON).setContentType(ContentType.JSON).log(LogDetail.ALL).build();
 
     private DBHelper() {
@@ -34,10 +37,10 @@ public class DBHelper {
                 .when().post(url)
                 .then().statusCode(statusCode);
     }
-
+    //TODO return dbUrl instead of address
     @SneakyThrows
     public static Connection getConn() {
-        return DriverManager.getConnection(System.getProperty("dbUrl"), "app", "pass");
+        return DriverManager.getConnection("jdbc:mysql://localhost:3306/app", "app", "pass");
     }
 
     @Data

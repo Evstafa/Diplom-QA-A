@@ -5,7 +5,10 @@ import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import io.qameta.allure.selenide.AllureSelenide;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import ru.netology.data.DBHelper;
 import ru.netology.data.DataHelper;
 import ru.netology.page.MainPage;
@@ -30,8 +33,8 @@ public class PaymentUITests {
         open("http://localhost:8080/");
     }
 
-    @AfterAll
-    public static void tearDown() {
+    @BeforeEach
+    public void tearDown() {
         cleanDatabase();
     }
 
@@ -40,160 +43,121 @@ public class PaymentUITests {
         SelenideLogger.removeListener("allure");
     }
 
-    // Positive tests
     @Epic(value = "UI-тесты")
     @Feature(value = "Оплата тура картой")
     @Story(value = "Позитивный. Покупка тура с действующей карты (номер с пробелами)")
     @Test
     public void shouldValidTestCardApproved() {
         MainPage mainPage = new MainPage();
-        var CardInfo = DataHelper.getValidCardApproved();
+        var cardInfo = DataHelper.getValidCardApproved();
         PaymentPage paymentPage = mainPage.paymentButtonClick();
-        paymentPage.inputData(CardInfo);
+        paymentPage.inputData(cardInfo);
         paymentPage.getSuccessNotification();
         assertEquals("APPROVED", DBHelper.getPaymentStatus());
     }
 
     @Epic(value = "UI-тесты")
-    @Feature(value = "Оплата тура картой")
+    @Feature(value = "Payment-UI")
     @Story(value = "Позитивный. Покупка тура с действующей карты (номер без пробелов)")
     @Test
     public void shouldValidTestCardApprovedWithoutSpaces() {
         MainPage mainPage = new MainPage();
-        var CardInfo = DataHelper.getValidCardApprovedWithoutSpaces();
+        var cardInfo = DataHelper.getValidCardApprovedWithoutSpaces();
         PaymentPage paymentPage = mainPage.paymentButtonClick();
-        paymentPage.inputData(CardInfo);
+        paymentPage.inputData(cardInfo);
         paymentPage.getSuccessNotification();
         assertEquals("APPROVED", DBHelper.getPaymentStatus());
     }
 
     @Epic(value = "UI-тесты")
-    @Feature(value = "Оплата тура картой")
-    @Story(value = "Позитивный. Покупка тура с недействующей карты (номер с пробелами)")
+    @Feature(value = "Payment-UI")
+    @Story(value = "Негативный. Поле Номер карты 11 цифр")
     @Test
-    public void shouldValidTestCardDeclined() {
+    public void shouldNotCardNumberInsufficientChar() {
         MainPage mainPage = new MainPage();
-        var CardInfo = DataHelper.getValidCardDeclined();
+        var cardInfo = DataHelper.getRandomCard11char();
         PaymentPage paymentPage = mainPage.paymentButtonClick();
-        paymentPage.inputData(CardInfo);
-        paymentPage.getErrorNotification();
-        assertEquals("DECLINED", DBHelper.getPaymentStatus());
-    }
-
-    //Negative tests/Validation
-    @Epic(value = "UI-тесты")
-    @Feature(value = "Проверка валидации")
-    @Story(value = "Поле Номер карты 11 цифр")
-    @Test
-    public void shouldNumberField11char() {
-        MainPage mainPage = new MainPage();
-        var CardInfo = DataHelper.getRandomCard11char();
-        PaymentPage paymentPage = mainPage.paymentButtonClick();
-        paymentPage.inputData(CardInfo);
+        paymentPage.inputData(cardInfo);
         paymentPage.getInputInvalid("Неверный формат");
     }
 
     @Epic(value = "UI-тесты")
-    @Feature(value = "Проверка валидации")
-    @Story(value = "Поле Номер карты 20 цифр")
+    @Feature(value = "Payment-UI")
+    @Story(value = "Негативный. Поле Номер карты 20 цифр")
     @Test
-    public void shouldNumberField20char() {
+    public void shouldNotCardNumberOverChar() {
         MainPage mainPage = new MainPage();
-        var CardInfo = DataHelper.getRandomCard20char();
+        var cardInfo = DataHelper.getRandomCard20char();
         PaymentPage paymentPage = mainPage.paymentButtonClick();
-        paymentPage.inputData(CardInfo);
+        paymentPage.inputData(cardInfo);
         paymentPage.getErrorNotification();
     }
 
     @Epic(value = "UI-тесты")
-    @Feature(value = "Проверка валидации")
-    @Story(value = "Поле Номер карты 16 цифр")
+    @Feature(value = "Payment-UI")
+    @Story(value = "Позитивный. Поле Номер карты 16 цифр")
     @Test
-    public void shouldNumberField16char() {
+    public void shouldCardNumberSixteenChar() {
         MainPage mainPage = new MainPage();
-        var CardInfo = DataHelper.getRandomCard16char();
+        var cardInfo = DataHelper.getRandomCard16char();
         PaymentPage paymentPage = mainPage.paymentButtonClick();
-        paymentPage.inputData(CardInfo);
+        paymentPage.inputData(cardInfo);
         paymentPage.getErrorNotification();
     }
 
     @Epic(value = "UI-тесты")
-    @Feature(value = "Проверка валидации")
-    @Story(value = "Поле Номер карты 19 цифр")
+    @Feature(value = "Payment-UI")
+    @Story(value = "Негативный. Поле Номер карты содержит не-цифры")
     @Test
-    public void shouldNumberField19char() {
+    public void shouldNotCardNumberSymbols() {
         MainPage mainPage = new MainPage();
-        var CardInfo = DataHelper.getRandomCard19char();
+        var cardInfo = DataHelper.getRandomCardSymbols();
         PaymentPage paymentPage = mainPage.paymentButtonClick();
-        paymentPage.inputData(CardInfo);
-        paymentPage.getErrorNotification();
-    }
-
-    @Epic(value = "UI-тесты")
-    @Feature(value = "Проверка валидации")
-    @Story(value = "Поле Номер карты символы")
-    @Test
-    public void shouldNumberFieldSymbols() {
-        MainPage mainPage = new MainPage();
-        var CardInfo = DataHelper.getRandomCardSymbols();
-        PaymentPage paymentPage = mainPage.paymentButtonClick();
-        paymentPage.inputData(CardInfo);
+        paymentPage.inputData(cardInfo);
         paymentPage.getInputInvalid("Неверный формат");
     }
 
     @Epic(value = "UI-тесты")
-    @Feature(value = "Проверка валидации")
-    @Story(value = "Поле Номер карты пустое")
+    @Feature(value = "Payment-UI")
+    @Story(value = "Негативный. Поле Номер карты не может быть пустым")
     @Test
-    public void shouldNumberFieldEmpty() {
+    public void shouldNotCardNumberEmpty() {
         MainPage mainPage = new MainPage();
-        var CardInfo = DataHelper.getCardEmpty();
+        var cardInfo = DataHelper.getCardEmpty();
         PaymentPage paymentPage = mainPage.paymentButtonClick();
-        paymentPage.inputData(CardInfo);
-        paymentPage.getInputInvalid("Поле обязательно для заполнения");
+        paymentPage.inputData(cardInfo);
+        paymentPage.getInputInvalid("Неверный формат");
     }
 
     @Epic(value = "UI-тесты")
-    @Feature(value = "Проверка валидации")
-    @Story(value = "Поле Месяц число больше 12")
+    @Feature(value = "Payment-UI")
+    @Story(value = "Негативный. Поле Месяц не может содержать значения свыше 12")
     @Test
-    public void shouldMonthFieldMore12() {
+    public void shouldNotMonthUpTwelve() {
         MainPage mainPage = new MainPage();
-        var CardInfo = DataHelper.getInvalidMonthOver12();
+        var cardInfo = DataHelper.getInvalidMonthOver12();
         PaymentPage paymentPage = mainPage.paymentButtonClick();
-        paymentPage.inputData(CardInfo);
+        paymentPage.inputData(cardInfo);
         paymentPage.getInputInvalid("Неверно указан срок действия карты");
     }
 
     @Epic(value = "UI-тесты")
-    @Feature(value = "Проверка валидации")
-    @Story(value = "Поле Месяц число 00")
+    @Feature(value = "Payment-UI")
+    @Story(value = "Негативный. Поле Месяц не может состоять из одной цифры")
     @Test
-    public void shouldMonthFieldNull() {
-        MainPage mainPage = new MainPage();
-        var CardInfo = DataHelper.getInvalidMonthNull();
-        PaymentPage paymentPage = mainPage.paymentButtonClick();
-        paymentPage.inputData(CardInfo);
-        paymentPage.getInputInvalid("Неверно указан срок действия карты");
-    }
-
-    @Epic(value = "UI-тесты")
-    @Feature(value = "Проверка валидации")
-    @Story(value = "Поле Месяц 1 число")
-    @Test
-    public void shouldMonthField1char() {
+    public void shouldNotMonthSingleDigit() {
         MainPage mainPage = new MainPage();
         var CardInfo = DataHelper.getMonth1char();
         PaymentPage paymentPage = mainPage.paymentButtonClick();
         paymentPage.inputData(CardInfo);
-        paymentPage.getSuccessNotification();
+        paymentPage.getInputInvalid("Неверный формат");
     }
 
     @Epic(value = "UI-тесты")
-    @Feature(value = "Проверка валидации")
-    @Story(value = "Поле Месяц математические символы")
+    @Feature(value = "Payment-UI")
+    @Story(value = "Негативный. Поле Месяц не содержать математические символы")
     @Test
-    public void shouldMonthFieldSymbols() {
+    public void shouldNotMonthSymbols() {
         MainPage mainPage = new MainPage();
         var CardInfo = DataHelper.getInvalidMonthSymbols();
         PaymentPage paymentPage = mainPage.paymentButtonClick();
@@ -202,34 +166,34 @@ public class PaymentUITests {
     }
 
     @Epic(value = "UI-тесты")
-    @Feature(value = "Проверка валидации")
-    @Story(value = "Поле Месяц меньше текущего")
+    @Feature(value = "Payment-UI")
+    @Story(value = "Негативный. Поле Месяц не может быть отрицательным")
     @Test
-    public void shouldMonthFieldLessCurrent() {
+    public void shouldNotMonthNegative() {
         MainPage mainPage = new MainPage();
-        var CardInfo = DataHelper.getInvalidMonthLessCurrent();
+        var CardInfo = DataHelper.getNegativeMonth();
         PaymentPage paymentPage = mainPage.paymentButtonClick();
         paymentPage.inputData(CardInfo);
-        paymentPage.getInputInvalid("Неверно указан срок действия карты");
+        paymentPage.getInputInvalid("Неверный формат");
     }
 
     @Epic(value = "UI-тесты")
-    @Feature(value = "Проверка валидации")
-    @Story(value = "Поле Месяц пустое")
+    @Feature(value = "Payment-UI")
+    @Story(value = "Негативный. Поле Месяц не может быть пустым")
     @Test
-    public void shouldMonthFieldEmpty() {
+    public void shouldNotMonthEmpty() {
         MainPage mainPage = new MainPage();
         var CardInfo = DataHelper.getMonthEmpty();
         PaymentPage paymentPage = mainPage.paymentButtonClick();
         paymentPage.inputData(CardInfo);
-        paymentPage.getInputInvalid("Поле обязательно для заполнения");
+        paymentPage.getInputInvalid("Неверный формат");
     }
 
     @Epic(value = "UI-тесты")
-    @Feature(value = "Проверка валидации")
-    @Story(value = "Поле Год меньше текущего")
+    @Feature(value = "Payment-UI")
+    @Story(value = "Негативный. Значение поля Год не может быть меньше текущего")
     @Test
-    public void shouldYearFieldLessCurrent() {
+    public void shouldNotYearFieldLessCurrent() {
         MainPage mainPage = new MainPage();
         var CardInfo = DataHelper.getInvalidYearLessCurrent();
         PaymentPage paymentPage = mainPage.paymentButtonClick();
@@ -238,10 +202,10 @@ public class PaymentUITests {
     }
 
     @Epic(value = "UI-тесты")
-    @Feature(value = "Проверка валидации")
-    @Story(value = "Поле Год число 00")
+    @Feature(value = "Payment-UI")
+    @Story(value = "Негативный. Поле Год не может быть равным нулю")
     @Test
-    public void shouldYearFieldNull() {
+    public void shouldNotYearZero() {
         MainPage mainPage = new MainPage();
         var CardInfo = DataHelper.getYearNull();
         PaymentPage paymentPage = mainPage.paymentButtonClick();
@@ -250,22 +214,22 @@ public class PaymentUITests {
     }
 
     @Epic(value = "UI-тесты")
-    @Feature(value = "Проверка валидации")
-    @Story(value = "Поле Год пустое")
+    @Feature(value = "Payment-UI")
+    @Story(value = "Негативный. Поле Год не может быть пустым")
     @Test
-    public void shouldYearFieldEmpty() {
+    public void shouldNotYearEmpty() {
         MainPage mainPage = new MainPage();
         var CardInfo = DataHelper.getYearEmpty();
         PaymentPage paymentPage = mainPage.paymentButtonClick();
         paymentPage.inputData(CardInfo);
-        paymentPage.getInputInvalid("Поле обязательно для заполнения");
+        paymentPage.getInputInvalid("Неверный формат");
     }
 
     @Epic(value = "UI-тесты")
-    @Feature(value = "Проверка валидации")
-    @Story(value = "Поле Владелец с пробелом в середине")
+    @Feature(value = "Payment-UI")
+    @Story(value = "Позитивный. Поле Владелец может быть с пробелом в середине")
     @Test
-    public void shouldHolderFieldWithSpaceMiddle() {
+    public void shouldHolderContainSpace() {
         MainPage mainPage = new MainPage();
         var cardInfo = DataHelper.getValidHolderWithSpaceMiddle();
         PaymentPage paymentPage = mainPage.paymentButtonClick();
@@ -274,70 +238,10 @@ public class PaymentUITests {
     }
 
     @Epic(value = "UI-тесты")
-    @Feature(value = "Проверка валидации")
-    @Story(value = "Поле Владелец с дефисом в середине")
+    @Feature(value = "Payment-UI")
+    @Story(value = "Позитивный. Поле Владелец может быть в нижнем регистре")
     @Test
-    public void shouldHolderFieldWithDashMiddle() {
-        MainPage mainPage = new MainPage();
-        var CardInfo = DataHelper.getValidHolderWithDashMiddle();
-        PaymentPage paymentPage = mainPage.paymentButtonClick();
-        paymentPage.inputData(CardInfo);
-        paymentPage.getSuccessNotification();
-    }
-
-    @Epic(value = "UI-тесты")
-    @Feature(value = "Проверка валидации")
-    @Story(value = "Поле Владелец с дефисом в начале")
-    @Test
-    public void shouldHolderFieldWithDashFirst() {
-        MainPage mainPage = new MainPage();
-        var CardInfo = DataHelper.getHolderWithDashFirst();
-        PaymentPage paymentPage = mainPage.paymentButtonClick();
-        paymentPage.inputData(CardInfo);
-        paymentPage.getInputInvalid("Неверный формат");
-    }
-
-    @Epic(value = "UI-тесты")
-    @Feature(value = "Проверка валидации")
-    @Story(value = "Поле Владелец с дефисом в конце")
-    @Test
-    public void shouldHolderFieldWithDashEnd() {
-        MainPage mainPage = new MainPage();
-        var CardInfo = DataHelper.getHolderWithDashEnd();
-        PaymentPage paymentPage = mainPage.paymentButtonClick();
-        paymentPage.inputData(CardInfo);
-        paymentPage.getInputInvalid("Неверный формат");
-    }
-
-    @Epic(value = "UI-тесты")
-    @Feature(value = "Проверка валидации")
-    @Story(value = "Поле Владелец с пробелом в начале")
-    @Test
-    public void shouldHolderFieldWithSpaceFirst() {
-        MainPage mainPage = new MainPage();
-        var CardInfo = DataHelper.getHolderWithSpaceFirst();
-        PaymentPage paymentPage = mainPage.paymentButtonClick();
-        paymentPage.inputData(CardInfo);
-        paymentPage.getInputInvalid("Неверный формат");
-    }
-
-    @Epic(value = "UI-тесты")
-    @Feature(value = "Проверка валидации")
-    @Story(value = "Поле Владелец с пробелом в конце")
-    @Test
-    public void shouldHolderFieldWithSpaceEnd() {
-        MainPage mainPage = new MainPage();
-        var CardInfo = DataHelper.getHolderWithSpaceEnd();
-        PaymentPage paymentPage = mainPage.paymentButtonClick();
-        paymentPage.inputData(CardInfo);
-        paymentPage.getInputInvalid("Неверный формат");
-    }
-
-    @Epic(value = "UI-тесты")
-    @Feature(value = "Проверка валидации")
-    @Story(value = "Поле Владелец нижний регистр")
-    @Test
-    public void shouldHolderFieldLowercase() {
+    public void shouldHolderLowercase() {
         MainPage mainPage = new MainPage();
         var CardInfo = DataHelper.getHolderLowercase();
         PaymentPage paymentPage = mainPage.paymentButtonClick();
@@ -346,46 +250,22 @@ public class PaymentUITests {
     }
 
     @Epic(value = "UI-тесты")
-    @Feature(value = "Проверка валидации")
-    @Story(value = "Поле Владелец кириллицей")
+    @Feature(value = "Payment-UI")
+    @Story(value = "Позитивный. Поле Владелец может быть с дефисом в середине")
     @Test
-    public void shouldHolderFieldRu() {
+    public void shouldHolderContainDash() {
         MainPage mainPage = new MainPage();
-        var CardInfo = DataHelper.getHolderRu();
+        var CardInfo = DataHelper.getValidHolderWithDashMiddle();
         PaymentPage paymentPage = mainPage.paymentButtonClick();
         paymentPage.inputData(CardInfo);
-        paymentPage.getInputInvalid("Неверный формат");
+        paymentPage.getSuccessNotification();
     }
 
     @Epic(value = "UI-тесты")
-    @Feature(value = "Проверка валидации")
-    @Story(value = "Поле Владелец латиницей и числами")
+    @Feature(value = "Payment-UI")
+    @Story(value = "Негативный. Поле Владелец не может быть пустым")
     @Test
-    public void shouldHolderFieldNumbers() {
-        MainPage mainPage = new MainPage();
-        var CardInfo = DataHelper.getHolderNumbers();
-        PaymentPage paymentPage = mainPage.paymentButtonClick();
-        paymentPage.inputData(CardInfo);
-        paymentPage.getInputInvalid("Неверный формат");
-    }
-
-    @Epic(value = "UI-тесты")
-    @Feature(value = "Проверка валидации")
-    @Story(value = "Поле Владелец латиницей и спецсимволами")
-    @Test
-    public void shouldHolderFieldSymbols() {
-        MainPage mainPage = new MainPage();
-        var CardInfo = DataHelper.getHolderSymbols();
-        PaymentPage paymentPage = mainPage.paymentButtonClick();
-        paymentPage.inputData(CardInfo);
-        paymentPage.getInputInvalid("Неверный формат");
-    }
-
-    @Epic(value = "UI-тесты")
-    @Feature(value = "Проверка валидации")
-    @Story(value = "Поле Владелец пустое")
-    @Test
-    public void shouldHolderFieldEmpty() {
+    public void shouldNotHolderEmpty() {
         MainPage mainPage = new MainPage();
         var CardInfo = DataHelper.getHolderEmpty();
         PaymentPage paymentPage = mainPage.paymentButtonClick();
@@ -394,10 +274,22 @@ public class PaymentUITests {
     }
 
     @Epic(value = "UI-тесты")
-    @Feature(value = "Проверка валидации")
-    @Story(value = "Поле CVC/CVV 2 цифры")
+    @Feature(value = "Payment-UI")
+    @Story(value = "Негативный. Поле Владелец не может состоять из пробела")
     @Test
-    public void shouldCVCField2char() {
+    public void shouldNotHolderOnlySpace() {
+        MainPage mainPage = new MainPage();
+        var CardInfo = DataHelper.getHolderSpace();
+        PaymentPage paymentPage = mainPage.paymentButtonClick();
+        paymentPage.inputData(CardInfo);
+        paymentPage.getInputInvalid("Поле обязательно для заполнения");
+    }
+
+    @Epic(value = "UI-тесты")
+    @Feature(value = "Payment-UI")
+    @Story(value = "Негативный. Поле CVC/CVV не может быть меньше 3 цифр")
+    @Test
+    public void shouldNotCVCLessThreeChar() {
         MainPage mainPage = new MainPage();
         var CardInfo = DataHelper.getInvalidCvc2char();
         PaymentPage paymentPage = mainPage.paymentButtonClick();
@@ -406,10 +298,10 @@ public class PaymentUITests {
     }
 
     @Epic(value = "UI-тесты")
-    @Feature(value = "Проверка валидации")
-    @Story(value = "Поле CVC/CVV 4 цифры")
+    @Feature(value = "Payment-UI")
+    @Story(value = "Негативный. Поле CVC/CVV не может быть больше 3 цифр")
     @Test
-    public void shouldCVCField4char() {
+    public void shouldNotCvcMoreThreeChar() {
         MainPage mainPage = new MainPage();
         var CardInfo = DataHelper.getInvalidCvc4char();
         PaymentPage paymentPage = mainPage.paymentButtonClick();
@@ -418,22 +310,22 @@ public class PaymentUITests {
     }
 
     @Epic(value = "UI-тесты")
-    @Feature(value = "Проверка валидации")
-    @Story(value = "Поле CVC/CVV символами")
+    @Feature(value = "Payment-UI")
+    @Story(value = "Негативный. Поле CVC/CVV не может содержать символы, отличные от цифр ")
     @Test
-    public void shouldCVCFieldSymbols() {
+    public void shouldNotCvcNonDigits() {
         MainPage mainPage = new MainPage();
         var CardInfo = DataHelper.getInvalidCvcSymbols();
         PaymentPage paymentPage = mainPage.paymentButtonClick();
         paymentPage.inputData(CardInfo);
-        paymentPage.getInputInvalid("Неверный формат");
+        paymentPage.getInputInvalid("Поле обязательно для заполнения");
     }
 
     @Epic(value = "UI-тесты")
-    @Feature(value = "Проверка валидации")
-    @Story(value = "Поле CVC/CVV пустое")
+    @Feature(value = "Payment-UI")
+    @Story(value = "Негативный. Поле CVC/CVV не может быть пустым")
     @Test
-    public void shouldCVCFieldEmpty() {
+    public void shouldNotCvcEmpty() {
         MainPage mainPage = new MainPage();
         var CardInfo = DataHelper.getCvcEmpty();
         PaymentPage paymentPage = mainPage.paymentButtonClick();
@@ -442,8 +334,8 @@ public class PaymentUITests {
     }
 
     @Epic(value = "UI-тесты")
-    @Feature(value = "Проверка валидации")
-    @Story(value = "Все поля пустые")
+    @Feature(value = "Payment-UI")
+    @Story(value = "Негативный. Поля не могут быть пустыми")
     @Test
     public void shouldAllFieldsEmpty() {
         MainPage mainPage = new MainPage();
@@ -451,14 +343,14 @@ public class PaymentUITests {
         PaymentPage paymentPage = mainPage.paymentButtonClick();
         paymentPage.inputData(CardInfo);
         $(byText("Номер карты")).parent().$(".input__sub").shouldBe(visible).
-                shouldHave(text("Поле обязательно для заполнения"));
+                shouldHave(text("Неверный формат"));
         $(byText("Месяц")).parent().$(".input__sub").shouldBe(visible).
-                shouldHave(text("Поле обязательно для заполнения"));
+                shouldHave(text("Неверный формат"));
         $(byText("Год")).parent().$(".input__sub").shouldBe(visible).
-                shouldHave(text("Поле обязательно для заполнения"));
+                shouldHave(text("Неверный формат"));
         $(byText("Владелец")).parent().$(".input__sub").shouldBe(visible).
                 shouldHave(text("Поле обязательно для заполнения"));
         $(byText("CVC/CVV")).parent().$(".input__sub").shouldBe(visible).
-                shouldHave(text("Поле обязательно для заполнения"));
+                shouldHave(text("Неверный формат"));
     }
 }

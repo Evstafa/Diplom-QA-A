@@ -62,11 +62,6 @@ public class DataHelper {
                 getValidCvc());
     }
 
-    public static CardInfo getRandomCard19char() {
-        return new CardInfo(fakerEng.numerify("#### #### #### #### ###"), getMonth(1), getYear(1), getValidHolder(),
-                getValidCvc());
-    }
-
     public static CardInfo getRandomCard11char() {
         return new CardInfo(fakerEng.numerify("#### #### ###"), getMonth(1), getYear(1), getValidHolder(),
                 getValidCvc());
@@ -96,17 +91,13 @@ public class DataHelper {
                 getYear(1), getValidHolder(), getValidCvc());
     }
 
-    public static CardInfo getInvalidMonthNull() {
-        return new CardInfo("4444 4444 4444 4441", "00", getYear(1), getValidHolder(), getValidCvc());
-    }
-
     public static CardInfo getInvalidMonthSymbols() {
         return new CardInfo("4444 4444 4444 4441", fakerEng.letterify("??"), getYear(1),
                 getValidHolder(), getValidCvc());
     }
 
-    public static CardInfo getInvalidMonthLessCurrent() {
-        return new CardInfo("4444 4444 4444 4441", getMonth(-1), getYear(0), getValidHolder(), getValidCvc());
+    public static CardInfo getNegativeMonth() {
+        return new CardInfo("4444 4444 4444 4441", "-1", getYear(0), getValidHolder(), getValidCvc());
     }
 
     public static CardInfo getMonthEmpty() {
@@ -136,48 +127,17 @@ public class DataHelper {
                 + "-" + fakerEng.name().lastName().toUpperCase() + "-" + fakerEng.name().lastName().toUpperCase(), getValidCvc());
     }
 
-    public static CardInfo getHolderWithDashFirst() {
-        return new CardInfo("4444 4444 4444 4441", getMonth(1), getYear(1), "-" + fakerEng.name().fullName().toUpperCase(),
-                getValidCvc());
-    }
-
-    public static CardInfo getHolderWithDashEnd() {
-        return new CardInfo("4444 4444 4444 4441", getMonth(1), getYear(1), fakerEng.name().fullName().toUpperCase() + "-",
-                getValidCvc());
-    }
-
-    public static CardInfo getHolderWithSpaceFirst() {
-        return new CardInfo("4444 4444 4444 4441", getMonth(1), getYear(1), " " + fakerEng.name().fullName().toUpperCase(),
-                getValidCvc());
-    }
-
-    public static CardInfo getHolderWithSpaceEnd() {
-        return new CardInfo("4444 4444 4444 4441", getMonth(1), getYear(1), fakerEng.name().fullName().toUpperCase() + " ",
-                getValidCvc());
-    }
-
     public static CardInfo getHolderLowercase() {
         return new CardInfo("4444 4444 4444 4441", getMonth(1), getYear(1), fakerEng.name().fullName().toLowerCase(),
                 getValidCvc());
     }
 
-    public static CardInfo getHolderRu() {
-        return new CardInfo("4444 4444 4444 4441", getMonth(1), getYear(1), fakerRu.name().firstName().toUpperCase()
-                + " " + fakerRu.name().lastName().toUpperCase(), getValidCvc());
-    }
-
-    public static CardInfo getHolderNumbers() {
-        return new CardInfo("4444 4444 4444 4441", getMonth(1), getYear(1), fakerEng.name().firstName().toUpperCase()
-                + " " + fakerEng.numerify("###"), getValidCvc());
-    }
-
-    public static CardInfo getHolderSymbols() {
-        return new CardInfo("4444 4444 4444 4441", getMonth(1), getYear(1), fakerEng.name().firstName().toUpperCase()
-                + " @" + fakerEng.name().lastName().toUpperCase(), getValidCvc());
-    }
-
     public static CardInfo getHolderEmpty() {
         return new CardInfo("4444 4444 4444 4441", getMonth(1), getYear(1), "", getValidCvc());
+    }
+
+    public static CardInfo getHolderSpace() {
+        return new CardInfo("4444 4444 4444 4441", getMonth(1), getYear(1), " ", getValidCvc());
     }
 
     public static CardInfo getInvalidCvc2char() {

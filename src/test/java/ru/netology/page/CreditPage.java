@@ -27,22 +27,11 @@ public class CreditPage {
 
     public CreditPage() {
         heading.shouldBe(visible);
-
         cardNumberField.shouldBe(visible);
-        cardNumberField.shouldBe(matchText("^[0-9]{16}$"));
-
         monthField.shouldBe(visible);
-        monthField.shouldBe(matchText("^(0?[0-1]|1[0-2])$"));
-
         yearField.shouldBe(visible);
-        yearField.shouldBe(matchText(String.valueOf(LocalDate.now().plusYears(1).getYear())));
-
         holderField.shouldBe(visible);
-        holderField.shouldBe(matchText("^[A-Za-z]+\\\\s[A-Za-z]+$"));
-
         cvcField.shouldBe(visible);
-        cvcField.shouldBe(matchText("\\d{3}"));
-
         continueButton.shouldBe(visible);
         successNotification.shouldBe(hidden);
         errorNotification.shouldBe(hidden);

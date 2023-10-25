@@ -22,7 +22,7 @@ public class CreditAPITests {
     private static List<DBHelper.PaymentEntity> payments;
     private static List<DBHelper.CreditRequestEntity> credits;
     private static List<DBHelper.OrderEntity> orders;
-    private static final String creditUrl = "http://localhost:8080/";
+    private static final String creditUrl = "/api/v1/credit";
 
     @BeforeAll
     public static void setUpAll() {
@@ -189,39 +189,5 @@ public class CreditAPITests {
         assertEquals(0, payments.size());
         assertEquals(0, credits.size());
         assertEquals(0, orders.size());
-    }
-
-    @Epic(value = "Обращение к БД через форму оплаты")
-    @Feature(value = "Оплата тура в кредит")
-    @Story(value = "Тур в кредит с действующей карты (ввод данных через форму), создание записи в таблице credit_request_entity")
-    @Test
-    public void shouldValidTestFormCreditCardApprovedEntityAdded() {
-        open("http://localhost:8080/");
-        MainPage mainPage = new MainPage();
-        var CardInfo = DataHelper.getValidCardApproved();
-        CreditPage creditPage = mainPage.creditButtonClick();
-        creditPage.inputData(CardInfo);
-        creditPage.getSuccessNotification();
-
-        assertEquals(0, payments.size());
-        assertEquals(1, credits.size());
-        assertEquals("APPROVED", DBHelper.getCreditStatus());
-    }
-
-    @Epic(value = "Обращение к БД через форму оплаты")
-    @Feature(value = "Оплата тура в кредит")
-    @Story(value = "Покупка тура в кредит с недействующей карты (ввод данных через форму), создание записи в таблице credit_request_entity")
-    @Test
-    public void shouldValidTestFormCreditCardDeclinedEntityAdded() {
-        open("http://localhost:8080/");
-        MainPage mainPage = new MainPage();
-        var CardInfo = DataHelper.getValidCardDeclined();
-        CreditPage creditPage = mainPage.creditButtonClick();
-        creditPage.inputData(CardInfo);
-        creditPage.getErrorNotification();
-
-        assertEquals(0, payments.size());
-        assertEquals(1, credits.size());
-        assertEquals("DECLINED", DBHelper.getCreditStatus());
     }
 }

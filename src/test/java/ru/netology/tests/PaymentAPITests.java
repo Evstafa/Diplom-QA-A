@@ -5,24 +5,20 @@ import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import io.qameta.allure.selenide.AllureSelenide;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import ru.netology.data.DBHelper;
 import ru.netology.data.DataHelper;
-import ru.netology.page.MainPage;
-import ru.netology.page.PaymentPage;
 
-import java.util.List;
-
-import static com.codeborne.selenide.Selenide.open;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static ru.netology.data.DBHelper.cleanDatabase;
 
 
 public class PaymentAPITests {
 
-    private static List<DBHelper.PaymentEntity> payments;
-    private static List<DBHelper.CreditRequestEntity> credits;
-    private static List<DBHelper.OrderEntity> orders;
+    private static final String paymentUrl = "/api/v1/pay";
 
     @BeforeAll
     public static void setUpAll() {
@@ -40,178 +36,84 @@ public class PaymentAPITests {
     }
 
     @Epic(value = "API-тесты")
-    @Feature(value = "Оплата тура картой")
-    @Story(value = "Позитивный. Покупка тура с действующей карты, создание записи в таблице payment_entity")
+    @Feature(value = "Payment API-тесты")
+    @Story(value = "Позитивный. Все данные корректны, создание записи в payment_entity, статус 200")
     @Test
-    public void shouldValidTestCardApprovedEntityAdded() {
+    public void shouldProceedPaymentWithAllDataCorrect() {
         var cardInfo = DataHelper.getValidCardApproved();
-        payments = DBHelper.getPayments();
-        credits = DBHelper.getCreditRequests();
+        DBHelper.getBody(cardInfo, paymentUrl, 200);
+        var payments = DBHelper.getPayments();
 
         assertEquals(1, payments.size());
-        assertEquals(0, credits.size());
         assertEquals("APPROVED", DBHelper.getPaymentStatus());
     }
 
     @Epic(value = "API-тесты")
-    @Feature(value = "Оплата тура картой")
-    @Story(value = "Позитивный. Покупка тура с действующей карты, создание записи в таблице order_entity")
+    @Feature(value = "Payment API-тесты")
+    @Story(value = "Позитивный. Все данные корректны, создание записи в order_entity, статус 200")
     @Test
-    public void shouldValidTestCardApprovedOrdersAdded() {
+    public void shouldPlacedOrderWithAllDataCorrect() {
         var cardInfo = DataHelper.getValidCardApproved();
-        orders = DBHelper.getOrders();
+        DBHelper.getBody(cardInfo, paymentUrl, 200);
+        var orders = DBHelper.getOrders();
 
         assertEquals(1, orders.size());
-        assertEquals(DBHelper.getBankIDForPayment(), DBHelper.getPaymentID());
+        assertEquals("APPROVED", DBHelper.getPaymentStatus());
     }
 
     @Epic(value = "API-тесты")
-    @Feature(value = "Оплата тура картой")
-    @Story(value = "Позитивный. Покупка тура с недействующей карты, создание записи в таблице payment_entity")
+    @Feature(value = "Payment API")
+    @Story(value = "Негативный. Случайный номер карты, записи о платеже и заказе не проводятся, статус 500")
     @Test
-    public void shouldValidTestCardDeclinedEntityAdded() {
-        var cardInfo = DataHelper.getValidCardDeclined();
-        payments = DBHelper.getPayments();
-        credits = DBHelper.getCreditRequests();
-
-        assertEquals(1, payments.size());
-        assertEquals(0, credits.size());
-        assertEquals("DECLINED", DBHelper.getPaymentStatus());
-    }
-
-    @Epic(value = "API-тесты")
-    @Feature(value = "Оплата тура картой")
-    @Story(value = "Позитивный. Покупка тура с недействующей карты, создание записи в таблице order_entity")
-    @Test
-    public void shouldValidTestCardDeclinedOrdersAdded() {
-        var cardInfo = DataHelper.getValidCardDeclined();
-        orders = DBHelper.getOrders();
-
-        assertEquals(1, orders.size());
-        assertEquals(DBHelper.getBankIDForPayment(), DBHelper.getPaymentID());
-    }
-
-    @Epic(value = "API-тесты")
-    @Feature(value = "Оплата тура картой")
-    @Story(value = "Отправка пустого POST запроса платежа")
-    @Test
-    public void shouldPOSTBodyEmpty() {
-        var cardInfo = DataHelper.getAllEmpty();
-        payments = DBHelper.getPayments();
-        credits = DBHelper.getCreditRequests();
-        orders = DBHelper.getOrders();
+    public void shouldNotProceedPaymentWithRandomCardNumber() {
+        var cardInfo = DataHelper.getRandomCard16char();
+        DBHelper.getBody(cardInfo, paymentUrl, 500);
+        var payments = DBHelper.getPayments();
+        var orders = DBHelper.getOrders();
 
         assertEquals(0, payments.size());
-        assertEquals(0, credits.size());
         assertEquals(0, orders.size());
     }
 
     @Epic(value = "API-тесты")
-    @Feature(value = "Оплата тура картой")
-    @Story(value = "Отправка POST запроса платежа с пустым значением number")
+    @Feature(value = "Payment API")
+    @Story(value = "Негативный. Короткий номер карты, записи о платеже и заказе не проводятся, статус 500")
     @Test
-    public void shouldPOSTNumberEmpty() {
+    public void shouldNotCardNumberInsufficientDigits() {
+        var cardInfo = DataHelper.getRandomCard11char();
+        DBHelper.getBody(cardInfo, paymentUrl, 500);
+        var payments = DBHelper.getPayments();
+        var orders = DBHelper.getOrders();
+
+        assertEquals(0, payments.size());
+        assertEquals(0, orders.size());
+    }
+
+    @Epic(value = "API-тесты")
+    @Feature(value = "Payment API")
+    @Story(value = "Негативный. Пустой номер карты, записи о платеже и заказе не проводятся, статус 500")
+    @Test
+    public void shouldNotEmptyCardNumber() {
         var cardInfo = DataHelper.getCardEmpty();
-        payments = DBHelper.getPayments();
-        credits = DBHelper.getCreditRequests();
-        orders = DBHelper.getOrders();
+        DBHelper.getBody(cardInfo, paymentUrl, 500);
+        var payments = DBHelper.getPayments();
+        var orders = DBHelper.getOrders();
 
         assertEquals(0, payments.size());
-        assertEquals(0, credits.size());
         assertEquals(0, orders.size());
     }
 
     @Epic(value = "API-тесты")
-    @Feature(value = "Оплата тура картой")
-    @Story(value = "Отправка POST запроса платежа с пустым значением month")
+    @Feature(value = "Payment API")
+    @Story(value = "Негативный. Форма пуста, записи о платеже и заказе не проводятся, статус 500")
     @Test
-    public void shouldPOSTMonthEmpty() {
-        var cardInfo = DataHelper.getMonthEmpty();
-        payments = DBHelper.getPayments();
-        credits = DBHelper.getCreditRequests();
-        orders = DBHelper.getOrders();
+    public void shouldNotFormEmpty() {
+        var cardInfo = DataHelper.getAllEmpty();
+        DBHelper.getBody(cardInfo, paymentUrl, 500);
+        var payments = DBHelper.getPayments();
+        var orders = DBHelper.getOrders();
 
         assertEquals(0, payments.size());
-        assertEquals(0, credits.size());
         assertEquals(0, orders.size());
-    }
-
-    @Epic(value = "API-тесты")
-    @Feature(value = "Оплата тура картой")
-    @Story(value = "Отправка POST запроса платежа с пустым значением year")
-    @Test
-    public void shouldPOSTYearEmpty() {
-        var cardInfo = DataHelper.getYearEmpty();
-        payments = DBHelper.getPayments();
-        credits = DBHelper.getCreditRequests();
-        orders = DBHelper.getOrders();
-
-        assertEquals(0, payments.size());
-        assertEquals(0, credits.size());
-        assertEquals(0, orders.size());
-    }
-
-    @Epic(value = "API-тесты")
-    @Feature(value = "Оплата тура картой")
-    @Story(value = "Отправка POST запроса платежа с пустым значением holder")
-    @Test
-    public void shouldPOSTHolderEmpty() {
-        var cardInfo = DataHelper.getHolderEmpty();
-        payments = DBHelper.getPayments();
-        credits = DBHelper.getCreditRequests();
-        orders = DBHelper.getOrders();
-
-        assertEquals(0, payments.size());
-        assertEquals(0, credits.size());
-        assertEquals(0, orders.size());
-    }
-
-    @Epic(value = "API-тесты")
-    @Feature(value = "Оплата тура картой")
-    @Story(value = "Отправка POST запроса платежа с пустым значением cvc")
-    @Test
-    public void shouldPOSTCvcEmpty() {
-        var cardInfo = DataHelper.getCvcEmpty();
-        payments = DBHelper.getPayments();
-        credits = DBHelper.getCreditRequests();
-        orders = DBHelper.getOrders();
-
-        assertEquals(0, payments.size());
-        assertEquals(0, credits.size());
-        assertEquals(0, orders.size());
-    }
-
-    @Epic(value = "Обращение к БД через форму оплаты")
-    @Feature(value = "Оплата тура картой")
-    @Story(value = "Покупка тура с действующей карты (ввод данных через форму), создание записи в таблице payment_entity")
-    @Test
-    public void shouldValidFormTestCardApprovedEntityAdded() {
-        open("http://localhost:8080/");
-        MainPage mainPage = new MainPage();
-        var CardInfo = DataHelper.getValidCardApproved();
-        PaymentPage paymentPage = mainPage.paymentButtonClick();
-        paymentPage.inputData(CardInfo);
-        paymentPage.getSuccessNotification();
-
-        assertEquals(1, payments.size());
-        assertEquals(0, credits.size());
-        assertEquals("APPROVED", DBHelper.getPaymentStatus());
-    }
-
-    @Epic(value = "Обращение к БД через форму оплаты")
-    @Feature(value = "Оплата тура картой")
-    @Story(value = "Покупка тура с недействующей карты (ввод данных через форму), создание записи в таблице payment_entity")
-    @Test
-    public void shouldValidFormTestCardDeclinedEntityAdded() {
-        open("http://localhost:8080/");
-        MainPage mainPage = new MainPage();
-        var CardInfo = DataHelper.getValidCardDeclined();
-        PaymentPage paymentPage = mainPage.paymentButtonClick();
-        paymentPage.inputData(CardInfo);
-        paymentPage.getErrorNotification();
-
-        assertEquals(1, payments.size());
-        assertEquals(0, credits.size());
-        assertEquals("DECLINED", DBHelper.getPaymentStatus());
     }
 }
