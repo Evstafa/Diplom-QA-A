@@ -13,6 +13,7 @@ import static com.codeborne.selenide.Selenide.$$;
 
 public class CreditPage {
 
+    private SelenideElement inputInvalid = $(".input__sub");
     private final SelenideElement heading = $$("h3").find(text("Кредит по данным карты"));
     private final SelenideElement cardNumberField = $(byText("Номер карты")).parent().$(".input__control");
     private final SelenideElement monthField = $(byText("Месяц")).parent().$(".input__control");
@@ -60,5 +61,9 @@ public class CreditPage {
         errorNotification.$("[class=notification__content]").should(text("Ошибка! Банк отказал в проведении операции."));
         errorButton.click();
         errorNotification.should(hidden);
+    }
+    public void getInputInvalid(String message) {
+        inputInvalid.shouldHave(text(message));
+        inputInvalid.shouldBe(visible);
     }
 }

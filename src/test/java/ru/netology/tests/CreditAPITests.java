@@ -190,4 +190,14 @@ public class CreditAPITests {
         assertEquals(0, credits.size());
         assertEquals(0, orders.size());
     }
+    @Epic(value = "API-тесты")
+    @Feature(value = "Credit API")
+    @Story(value = "Негативный. Номер карты не может быть длиннее 20 символов, записи о платеже и заказе не проводятся, статус 500")
+    @Test
+    public void shouldNotCardNumberOverChar() {
+        var cardInfo = DataHelper.getRandomCard20char();
+        DBHelper.getBody(cardInfo, creditUrl, 500);
+        var credits = DBHelper.getCreditRequests();
+        assertEquals(0, credits.size());
+    }
 }

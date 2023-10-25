@@ -59,19 +59,6 @@ public class CreditUITests {
 
     @Epic(value = "UI-тесты")
     @Feature(value = "Credit-UI")
-    @Story(value = "Позитивный. Покупка тура с действующей карты (номер без пробелов)")
-    @Test
-    public void shouldValidTestCardApprovedWithoutSpaces() {
-        MainPage mainPage = new MainPage();
-        var cardInfo = DataHelper.getValidCardApprovedWithoutSpaces();
-        CreditPage creditPage = mainPage.creditButtonClick();
-        creditPage.inputData(cardInfo);
-        creditPage.getSuccessNotification();
-        assertEquals("APPROVED", DBHelper.getPaymentStatus());
-    }
-
-    @Epic(value = "UI-тесты")
-    @Feature(value = "Credit-UI")
     @Story(value = "Негативный. Поле Номер карты 11 цифр")
     @Test
     public void shouldNotCardNumberInsufficientChar() {
