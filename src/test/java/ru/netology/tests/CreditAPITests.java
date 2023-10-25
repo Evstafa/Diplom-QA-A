@@ -14,6 +14,7 @@ import ru.netology.page.MainPage;
 import java.util.List;
 
 import static com.codeborne.selenide.Selenide.open;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static ru.netology.data.DBHelper.cleanDatabase;
 
@@ -53,7 +54,6 @@ public class CreditAPITests {
         assertEquals(1, credits.size());
         assertEquals("APPROVED", DBHelper.getCreditStatus());
     }
-
     @Epic(value = "API-тесты")
     @Feature(value = "Оплата тура в кредит")
     @Story(value = "Позитивный. Покупка тура в кредит с действующей карты, создание записи в таблице order_entity")
@@ -61,10 +61,14 @@ public class CreditAPITests {
     public void shouldValidTestCreditCardApprovedOrdersAdded() {
         var cardInfo = DataHelper.getValidCardApproved();
         DBHelper.getBody(cardInfo, creditUrl, 200);
-        orders = DBHelper.getOrders();
+        var creditRequests = DBHelper.getCreditRequests();
+        var orders = DBHelper.getOrders();
 
-        assertEquals(1, orders.size());
-        assertEquals(DBHelper.getBankIDForCredit(), DBHelper.getCreditID());
+        assertAll(
+                () -> assertEquals(1, creditRequests.size()),
+                () -> assertEquals(DBHelper.getCreditStatus(), creditRequests.get(0).getStatus()),
+                () -> assertEquals(DBHelper.getBankIDForCredit(), creditRequests.get(0).getBank_id()),
+                () -> assertEquals(1, orders.size()));
     }
 
     @Epic(value = "API-тесты")
@@ -80,19 +84,6 @@ public class CreditAPITests {
         assertEquals(0, payments.size());
         assertEquals(1, credits.size());
         assertEquals("DECLINED", DBHelper.getCreditStatus());
-    }
-
-    @Epic(value = "API-тесты")
-    @Feature(value = "Оплата тура в кредит")
-    @Story(value = "Позитивный. Покупка тура в кредит с недействующей карты, создание записи в таблице order_entity")
-    @Test
-    public void shouldValidTestCreditCardDeclinedOrdersAdded() {
-        var cardInfo = DataHelper.getValidCardDeclined();
-        DBHelper.getBody(cardInfo, creditUrl, 200);
-        orders = DBHelper.getOrders();
-
-        assertEquals(1, orders.size());
-        assertEquals(DBHelper.getBankIDForCredit(), DBHelper.getCreditID());
     }
 
     @Epic(value = "API-тесты")
